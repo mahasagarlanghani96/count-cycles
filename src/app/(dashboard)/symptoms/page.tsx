@@ -1,4 +1,5 @@
 import { SymptomLogger } from "@/features/symptoms/components/symptom-logger";
+import { SymptomHistory } from "@/features/symptoms/components/symptom-history";
 
 export const metadata = {
   title: "Log Symptoms",
@@ -17,6 +18,7 @@ export default function SymptomsPage() {
         </p>
       </div>
       <SymptomLogger />
+      <SymptomHistory />
     </div>
   );
 }

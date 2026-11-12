@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/providers/auth-provider";
 import { getCurrentCycleInfo } from "@/lib/dates";
-import type { PeriodRecord, DailyLog, CyclePhase } from "@/types";
+import type { PeriodRecord, DailyLog, SymptomLog, CyclePhase } from "@/types";
 import {
   Card,
   CardHeader,
@@ -97,6 +97,24 @@ export function DashboardView() {
     enabled: !!user,
   });
 
+  const todayStr = format(new Date(), "yyyy-MM-dd");
+
+  const { data: todaySymptoms } = useQuery<SymptomLog[]>({
+    queryKey: ["symptom_logs", user?.id, todayStr],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from("symptom_logs")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("log_date", todayStr)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: !!user,
+  });
+
   const isLoading = periodsLoading || logsLoading;
 
   const cycleInfo = periods && periods.length > 0
@@ -108,7 +126,7 @@ export function DashboardView() {
   const cycleLength = 28;
   const guidance = PHASE_GUIDANCE[phase];
   const todaysLog = dailyLogs?.find(
-    (log) => log.log_date === format(new Date(), "yyyy-MM-dd")
+    (log) => log.log_date === todayStr
   );
 
   const [now, setNow] = useState(new Date());
@@ -252,36 +270,59 @@ export function DashboardView() {
       </Card>
 
       {/* Today's Log Summary */}
-      {todaysLog && (
+      {(todaysLog || (todaySymptoms && todaySymptoms.length > 0)) && (
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Today&apos;s Log</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {todaysLog.mood && (
-                <Badge variant="secondary">
-                  Mood: {todaysLog.mood}
-                </Badge>
-              )}
-              {todaysLog.flow_intensity && (
-                <Badge variant="secondary">
-                  Flow: {todaysLog.flow_intensity}
-                </Badge>
-              )}
-              {todaysLog.energy_level !== null && (
-                <Badge variant="secondary">
-                  Energy: {todaysLog.energy_level}/5
-                </Badge>
-              )}
-              {todaysLog.sleep_quality !== null && (
-                <Badge variant="secondary">
-                  Sleep: {todaysLog.sleep_quality}/5
-                </Badge>
-              )}
-            </div>
-            {todaysLog.notes && (
-              <p className="mt-2 text-sm text-muted">{todaysLog.notes}</p>
+          <CardContent className="space-y-3">
+            {todaysLog && (
+              <div className="flex flex-wrap gap-2">
+                {todaysLog.mood && (
+                  <Badge variant="secondary">
+                    Mood: {todaysLog.mood}
+                  </Badge>
+                )}
+                {todaysLog.flow_intensity && (
+                  <Badge variant="secondary">
+                    Flow: {todaysLog.flow_intensity}
+                  </Badge>
+                )}
+                {todaysLog.energy_level !== null && (
+                  <Badge variant="secondary">
+                    Energy: {todaysLog.energy_level}/5
+                  </Badge>
+                )}
+                {todaysLog.sleep_quality !== null && (
+                  <Badge variant="secondary">
+                    Sleep: {todaysLog.sleep_quality}/5
+                  </Badge>
+                )}
+              </div>
+            )}
+            {todaySymptoms && todaySymptoms.length > 0 && (
+              <div>
+                <p className="text-xs text-muted mb-1.5">Symptoms</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {todaySymptoms.map((s) => (
+                    <Badge
+                      key={s.id}
+                      variant={
+                        s.severity === "severe"
+                          ? "destructive"
+                          : s.severity === "moderate"
+                            ? "accent"
+                            : "secondary"
+                      }
+                    >
+                      {s.symptom_name}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+            {todaysLog?.notes && (
+              <p className="text-sm text-muted">{todaysLog.notes}</p>
             )}
           </CardContent>
         </Card>

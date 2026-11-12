@@ -1,4 +1,5 @@
 import { MoodLogger } from "@/features/mood/components/mood-logger";
+import { MoodHistory } from "@/features/mood/components/mood-history";
 
 export const metadata = {
   title: "Log Mood",
@@ -17,6 +18,7 @@ export default function MoodPage() {
         </p>
       </div>
       <MoodLogger />
+      <MoodHistory />
     </div>
   );
 }
