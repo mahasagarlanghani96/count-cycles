@@ -239,7 +239,7 @@ describe("calculateCycleStats", () => {
     const stats = calculateCycleStats([makePeriod("2025-01-01", "2025-01-05")]);
     expect(stats.averageCycleLength).toBeNull();
     expect(stats.medianCycleLength).toBeNull();
-    expect(stats.totalRecordedCycles).toBe(0);
+    expect(stats.totalRecordedCycles).toBe(1);
     expect(stats.isRegular).toBeNull();
     // averagePeriodLength should still be computed
     expect(stats.averagePeriodLength).toBe(5);
@@ -295,7 +295,7 @@ describe("calculateCycleStats", () => {
 
   it("reports correct totalRecordedCycles", () => {
     const stats = calculateCycleStats(regularPeriods);
-    expect(stats.totalRecordedCycles).toBe(6);
+    expect(stats.totalRecordedCycles).toBe(7);
   });
 });
 

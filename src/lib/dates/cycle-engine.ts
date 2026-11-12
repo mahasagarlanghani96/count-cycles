@@ -101,7 +101,7 @@ export function calculateCycleStats(periods: PeriodRecord[]): CycleStats {
     shortestCycle: cycleLengths.length > 0 ? Math.min(...cycleLengths) : null,
     longestCycle: cycleLengths.length > 0 ? Math.max(...cycleLengths) : null,
     cycleLengthVariability: variability !== null ? Math.round(variability * 10) / 10 : null,
-    totalRecordedCycles: cycleLengths.length,
+    totalRecordedCycles: sortPeriodsByDate(periods).length,
     isRegular: variability !== null ? variability <= 4 : null,
   };
 }
