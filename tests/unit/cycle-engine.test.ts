@@ -508,6 +508,24 @@ describe("getCurrentCycleInfo", () => {
     const info = getCurrentCycleInfo(periods, new Date("2025-03-05"), 28);
     expect(info.cycleDay).toBeNull();
   });
+
+  it("cycleDay is 3 two days after start", () => {
+    const periods = [makePeriod("2025-11-10", "2025-11-15")];
+    const info = getCurrentCycleInfo(periods, new Date("2025-11-12"), 28);
+    expect(info.cycleDay).toBe(3);
+  });
+
+  it("isOnPeriod is true when no end_date is set (period started, not ended)", () => {
+    const periods = [makePeriod("2025-11-10", null)];
+    const info = getCurrentCycleInfo(periods, new Date("2025-11-12"), 28);
+    expect(info.isOnPeriod).toBe(true);
+  });
+
+  it("isOnPeriod is false after end_date is set and reference is past end", () => {
+    const periods = [makePeriod("2025-11-10", "2025-11-14")];
+    const info = getCurrentCycleInfo(periods, new Date("2025-11-16"), 28);
+    expect(info.isOnPeriod).toBe(false);
+  });
 });
 
 // ---------------------------------------------------------------------------

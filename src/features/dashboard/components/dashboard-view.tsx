@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { createClient } from "@/lib/supabase/client";
@@ -110,6 +111,16 @@ export function DashboardView() {
     (log) => log.log_date === format(new Date(), "yyyy-MM-dd")
   );
 
+  const [now, setNow] = useState(new Date());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const hour = now.getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  const firstName = (user?.user_metadata?.display_name as string)?.split(" ")[0] ?? "";
+
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -132,13 +143,13 @@ export function DashboardView() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Greeting */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-foreground">
-          Dashboard
+          {greeting}{firstName ? `, ${firstName}` : ""}
         </h1>
         <p className="text-sm text-muted mt-1">
-          {format(new Date(), "EEEE, MMMM d, yyyy")}
+          {format(now, "EEEE, MMMM d, yyyy")} &middot; {format(now, "h:mm a")}
         </p>
       </div>
 
@@ -150,6 +161,14 @@ export function DashboardView() {
             cycleLength={cycleLength}
             phase={phase}
           />
+          {cycleInfo?.isOnPeriod && cycleDay && (
+            <div className="mt-4 flex justify-center">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-pink-100 px-4 py-1.5 text-sm font-semibold text-pink-700 dark:bg-pink-950/40 dark:text-pink-300">
+                <span className="text-base">{"\u{1FA78}"}</span>
+                Day {cycleDay} of your period
+              </span>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -213,7 +232,10 @@ export function DashboardView() {
         <h2 className="mb-3 text-sm font-semibold text-muted">
           Quick Actions
         </h2>
-        <QuickActions />
+        <QuickActions
+          latestPeriod={periods?.[0] ?? null}
+          isOnPeriod={cycleInfo?.isOnPeriod ?? false}
+        />
       </div>
 
       {/* Daily Guidance */}

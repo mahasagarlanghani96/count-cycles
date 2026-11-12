@@ -10,6 +10,7 @@ import { BrandLogo } from "@/components/shared/brand-logo";
 import { signupSchema, type SignupInput } from "@/lib/validation/schemas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import {
   Card,
   CardContent,
@@ -134,9 +135,8 @@ export default function SignupPage() {
 
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 placeholder="At least 8 characters"
                 autoComplete="new-password"
                 error={errors.password?.message}
@@ -146,9 +146,8 @@ export default function SignupPage() {
 
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm password</Label>
-              <Input
+              <PasswordInput
                 id="confirmPassword"
-                type="password"
                 placeholder="Re-enter your password"
                 autoComplete="new-password"
                 error={errors.confirmPassword?.message}

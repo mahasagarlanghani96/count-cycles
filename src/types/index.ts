@@ -6,6 +6,7 @@ export type {
   DailyLog,
   SymptomLog,
   Reminder,
+  LoginSession,
   FlowIntensity,
   MoodType,
   SymptomSeverity,

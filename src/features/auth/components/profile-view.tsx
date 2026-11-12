@@ -19,6 +19,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SessionList } from "@/features/auth/components/session-list";
 import type { Profile, UserPreferences } from "@/types";
 
 export function ProfileView() {
@@ -227,6 +228,8 @@ export function ProfileView() {
           </label>
         </CardContent>
       </Card>
+
+      <SessionList />
 
       <Card>
         <CardHeader>

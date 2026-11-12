@@ -1,153 +1,64 @@
 "use client";
 
-import { useState } from "react";
+import { format } from "date-fns";
 import Link from "next/link";
-import { format, isBefore, isAfter, startOfDay } from "date-fns";
-import { useCreatePeriod } from "@/features/periods/hooks/use-periods";
-import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+  useCreatePeriod,
+  useUpdatePeriod,
+} from "@/features/periods/hooks/use-periods";
+import type { PeriodRecord } from "@/types";
 
-export function QuickActions() {
-  const [logDialogOpen, setLogDialogOpen] = useState(false);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [error, setError] = useState<string | null>(null);
+interface QuickActionsProps {
+  latestPeriod?: PeriodRecord | null;
+  isOnPeriod?: boolean;
+}
+
+export function QuickActions({ latestPeriod, isOnPeriod }: QuickActionsProps) {
   const createPeriod = useCreatePeriod();
+  const updatePeriod = useUpdatePeriod();
 
   const today = format(new Date(), "yyyy-MM-dd");
 
-  function validate(): string | null {
-    if (!startDate) return "Please select a start date.";
-    if (!endDate) return "Please select an end date.";
-    if (isAfter(startOfDay(new Date(startDate)), startOfDay(new Date()))) {
-      return "Start date cannot be in the future.";
-    }
-    if (isAfter(startOfDay(new Date(endDate)), startOfDay(new Date()))) {
-      return "End date cannot be in the future.";
-    }
-    if (isBefore(new Date(endDate), new Date(startDate))) {
-      return "End date must be on or after start date.";
-    }
-    return null;
+  function handleStartPeriod() {
+    createPeriod.mutate({
+      start_date: today,
+      end_date: null,
+      is_predicted: false,
+      notes: null,
+    });
   }
 
-  function handleSave() {
-    const validationError = validate();
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-    setError(null);
-    createPeriod.mutate(
-      {
-        start_date: startDate,
-        end_date: endDate,
-        is_predicted: false,
-        notes: null,
-      },
-      {
-        onSuccess: () => {
-          handleClose();
-        },
-        onError: (err) => {
-          setError(err instanceof Error ? err.message : "Failed to save.");
-        },
-      }
-    );
-  }
-
-  function handleClose() {
-    setStartDate("");
-    setEndDate("");
-    setError(null);
-    setLogDialogOpen(false);
+  function handleEndPeriod() {
+    if (!latestPeriod) return;
+    updatePeriod.mutate({
+      id: latestPeriod.id,
+      end_date: today,
+    });
   }
 
   return (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-      {/* Log Period */}
+    <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      {/* Start Period */}
       <button
         type="button"
-        onClick={() => setLogDialogOpen(true)}
-        className="inline-flex h-auto flex-col items-center justify-center gap-2 rounded-2xl border-2 border-pink-200 bg-pink-50/50 px-4 py-4 text-pink-700 hover:bg-pink-100/80 dark:border-pink-900 dark:bg-pink-950/30 dark:text-pink-300 dark:hover:bg-pink-950/50 text-sm font-semibold transition-all duration-200"
+        onClick={handleStartPeriod}
+        disabled={isOnPeriod || createPeriod.isPending}
+        className="inline-flex h-auto flex-col items-center justify-center gap-2 rounded-2xl border-2 border-pink-200 bg-pink-50/50 px-4 py-4 text-pink-700 hover:bg-pink-100/80 dark:border-pink-900 dark:bg-pink-950/30 dark:text-pink-300 dark:hover:bg-pink-950/50 text-sm font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <span className="text-2xl">{"\u{1FA78}"}</span>
-        <span className="text-xs font-medium">Log Period</span>
+        <span className="text-xs font-medium">Start Period</span>
       </button>
 
-      <Dialog open={logDialogOpen} onOpenChange={handleClose}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Log Period</DialogTitle>
-            <DialogDescription>
-              Record your period with start and end dates.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 mt-2">
-            {error && (
-              <div className="rounded-xl bg-red-50 p-3 text-center text-sm text-red-600">
-                {error}
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <label htmlFor="qa-start-date" className="text-sm font-medium">
-                Start Date <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="qa-start-date"
-                type="date"
-                max={today}
-                value={startDate}
-                onChange={(e) => {
-                  setStartDate(e.target.value);
-                  setError(null);
-                }}
-                className="flex w-full rounded-xl border border-border bg-surface px-4 py-2.5 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="qa-end-date" className="text-sm font-medium">
-                End Date <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="qa-end-date"
-                type="date"
-                min={startDate || undefined}
-                max={today}
-                value={endDate}
-                onChange={(e) => {
-                  setEndDate(e.target.value);
-                  setError(null);
-                }}
-                className="flex w-full rounded-xl border border-border bg-surface px-4 py-2.5 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
-              />
-            </div>
-
-            <div className="flex gap-3 pt-2">
-              <Button variant="outline" className="flex-1" onClick={handleClose}>
-                Cancel
-              </Button>
-              <Button
-                className="flex-1"
-                onClick={handleSave}
-                loading={createPeriod.isPending}
-                disabled={!startDate || !endDate}
-              >
-                Save Period
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* End Period */}
+      <button
+        type="button"
+        onClick={handleEndPeriod}
+        disabled={!isOnPeriod || updatePeriod.isPending}
+        className="inline-flex h-auto flex-col items-center justify-center gap-2 rounded-2xl border-2 border-rose-200 bg-rose-50/50 px-4 py-4 text-rose-700 hover:bg-rose-100/80 dark:border-rose-900 dark:bg-rose-950/30 dark:text-rose-300 dark:hover:bg-rose-950/50 text-sm font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <span className="text-2xl">{"✔️"}</span>
+        <span className="text-xs font-medium">End Period</span>
+      </button>
 
       {/* Log Symptoms */}
       <Link

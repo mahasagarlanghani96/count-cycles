@@ -101,6 +101,16 @@ export interface Reminder {
   updated_at: string;
 }
 
+export interface LoginSession {
+  id: string;
+  user_id: string;
+  logged_in_at: string;
+  logged_out_at: string | null;
+  device_info: string | null;
+  is_active: boolean;
+  created_at: string;
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -139,6 +149,11 @@ export interface Database {
         Row: Reminder;
         Insert: Omit<Reminder, "id" | "created_at" | "updated_at">;
         Update: Partial<Omit<Reminder, "id" | "created_at" | "updated_at">>;
+      };
+      login_sessions: {
+        Row: LoginSession;
+        Insert: Omit<LoginSession, "id" | "created_at">;
+        Update: Partial<Omit<LoginSession, "id" | "created_at">>;
       };
     };
     Views: {

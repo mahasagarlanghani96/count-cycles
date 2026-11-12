@@ -49,10 +49,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [supabase.auth]);
 
   const signOut = useCallback(async () => {
+    if (user) {
+      try {
+        await supabase
+          .from("login_sessions")
+          .update({ logged_out_at: new Date().toISOString(), is_active: false })
+          .eq("user_id", user.id)
+          .eq("is_active", true);
+      } catch {
+        // Non-critical
+      }
+    }
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
-  }, [supabase.auth]);
+  }, [supabase, user]);
 
   return (
     <AuthContext.Provider value={{ user, session, loading, signOut }}>

@@ -53,6 +53,42 @@ test.describe("Auth Pages", () => {
       page.getByRole("button", { name: /reset/i })
     ).toBeVisible();
   });
+
+  test("login page has password visibility toggle", async ({ page }) => {
+    await page.goto("/login");
+    const passwordInput = page.locator("input[id='password']");
+    await expect(passwordInput).toHaveAttribute("type", "password");
+
+    const toggle = page.getByRole("button", { name: /show password/i });
+    await expect(toggle).toBeVisible();
+    await toggle.click();
+    await expect(passwordInput).toHaveAttribute("type", "text");
+
+    const hideToggle = page.getByRole("button", { name: /hide password/i });
+    await hideToggle.click();
+    await expect(passwordInput).toHaveAttribute("type", "password");
+  });
+
+  test("signup page has password visibility toggles", async ({ page }) => {
+    await page.goto("/signup");
+    const toggles = page.getByRole("button", { name: /show password/i });
+    await expect(toggles).toHaveCount(2);
+  });
+
+  test("forgot password link is below password field on login", async ({ page }) => {
+    await page.goto("/login");
+    const passwordInput = page.locator("input[id='password']");
+    const forgotLink = page.getByRole("link", { name: /forgot password/i });
+
+    const inputBox = await passwordInput.boundingBox();
+    const linkBox = await forgotLink.boundingBox();
+
+    expect(inputBox).toBeTruthy();
+    expect(linkBox).toBeTruthy();
+    if (inputBox && linkBox) {
+      expect(linkBox.y).toBeGreaterThan(inputBox.y + inputBox.height - 5);
+    }
+  });
 });
 
 test.describe("PWA", () => {

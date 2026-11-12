@@ -10,6 +10,7 @@ import { BrandLogo } from "@/components/shared/brand-logo";
 import { loginSchema, type LoginInput } from "@/lib/validation/schemas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import {
   Card,
   CardContent,
@@ -46,6 +47,18 @@ export default function LoginPage() {
       if (error) {
         setServerError(error.message);
         return;
+      }
+
+      try {
+        await supabase.from("login_sessions").insert({
+          user_id: (await supabase.auth.getUser()).data.user!.id,
+          logged_in_at: new Date().toISOString(),
+          logged_out_at: null,
+          device_info: navigator.userAgent,
+          is_active: true,
+        });
+      } catch {
+        // Session tracking is non-critical — don't block login
       }
 
       router.push("/dashboard");
@@ -89,23 +102,20 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <Link
-                  href="/forgot-password"
-                  className="text-xs font-medium text-primary-500 hover:underline"
-                >
-                  Forgot password?
-                </Link>
-              </div>
-              <Input
+              <Label htmlFor="password">Password</Label>
+              <PasswordInput
                 id="password"
-                type="password"
                 placeholder="Enter your password"
                 autoComplete="current-password"
                 error={errors.password?.message}
                 {...register("password")}
               />
+              <Link
+                href="/forgot-password"
+                className="inline-block text-xs font-medium text-primary-500 hover:underline"
+              >
+                Forgot password?
+              </Link>
             </div>
 
             <Button
