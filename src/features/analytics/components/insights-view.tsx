@@ -174,11 +174,13 @@ export function InsightsView() {
   const since = format(subMonths(new Date(), timeRange), "yyyy-MM-dd");
 
   const { data: periods, isLoading: periodsLoading } = useQuery({
-    queryKey: ["periods", user?.id],
+    queryKey: ["period_records", user?.id],
     queryFn: async () => {
+      if (!user) return [];
       const { data } = await supabase
         .from("period_records")
         .select("*")
+        .eq("user_id", user.id)
         .eq("is_predicted", false)
         .order("start_date", { ascending: true });
       return (data ?? []) as PeriodRecord[];
@@ -187,11 +189,13 @@ export function InsightsView() {
   });
 
   const { data: symptoms, isLoading: symptomsLoading } = useQuery({
-    queryKey: ["symptoms", user?.id, since],
+    queryKey: ["symptom_logs", user?.id, since],
     queryFn: async () => {
+      if (!user) return [];
       const { data } = await supabase
         .from("symptom_logs")
         .select("*")
+        .eq("user_id", user.id)
         .gte("log_date", since)
         .order("log_date", { ascending: false });
       return (data ?? []) as SymptomLog[];
@@ -200,11 +204,13 @@ export function InsightsView() {
   });
 
   const { data: dailyLogs, isLoading: logsLoading } = useQuery({
-    queryKey: ["daily-logs", user?.id, since],
+    queryKey: ["daily_logs", user?.id, since],
     queryFn: async () => {
+      if (!user) return [];
       const { data } = await supabase
         .from("daily_logs")
         .select("*")
+        .eq("user_id", user.id)
         .gte("log_date", since)
         .order("log_date", { ascending: false });
       return (data ?? []) as DailyLog[];
@@ -249,7 +255,7 @@ export function InsightsView() {
       `Generated: ${format(new Date(), "MMMM d, yyyy")}`,
       "",
       "CYCLE STATISTICS",
-      `Total recorded cycles: ${stats.totalRecordedCycles}`,
+      `Total recorded periods: ${stats.totalRecordedCycles}`,
       `Average cycle length: ${stats.averageCycleLength ?? "Insufficient data"} days`,
       `Median cycle length: ${stats.medianCycleLength ?? "Insufficient data"} days`,
       `Average period length: ${stats.averagePeriodLength ?? "Insufficient data"} days`,

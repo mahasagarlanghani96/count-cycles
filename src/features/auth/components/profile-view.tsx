@@ -82,9 +82,9 @@ export function ProfileView() {
 
   async function handleExportData() {
     const [periods, symptoms, dailyLogs] = await Promise.all([
-      supabase.from("period_records").select("*").order("start_date"),
-      supabase.from("symptom_logs").select("*").order("log_date"),
-      supabase.from("daily_logs").select("*").order("log_date"),
+      supabase.from("period_records").select("*").eq("user_id", user!.id).order("start_date"),
+      supabase.from("symptom_logs").select("*").eq("user_id", user!.id).order("log_date"),
+      supabase.from("daily_logs").select("*").eq("user_id", user!.id).order("log_date"),
     ]);
 
     const exportData = {
