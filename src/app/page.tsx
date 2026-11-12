@@ -1,15 +1,13 @@
 import Link from "next/link";
-import { Flower2, ArrowRight, Shield, Heart, Calendar } from "lucide-react";
+import { ArrowRight, Shield, Heart, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BrandLogo } from "@/components/shared/brand-logo";
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <header className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto w-full">
-        <div className="flex items-center gap-2">
-          <Flower2 className="h-7 w-7 text-primary-500" />
-          <span className="text-xl font-bold">CycleCare</span>
-        </div>
+        <BrandLogo variant="full" size="sm" />
         <div className="flex items-center gap-3">
           <Link href="/login">
             <Button variant="ghost" size="sm">

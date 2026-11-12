@@ -9,8 +9,8 @@ import {
   BarChart3,
   User,
   BookOpen,
-  Flower2,
 } from "lucide-react";
+import { BrandLogo } from "@/components/shared/brand-logo";
 import { cn } from "@/lib/utils";
 
 const sidebarItems = [
@@ -27,9 +27,8 @@ export function Sidebar() {
 
   return (
     <aside className="hidden md:flex w-64 flex-col border-r border-border bg-surface h-screen sticky top-0">
-      <div className="flex items-center gap-3 px-6 py-5 border-b border-border">
-        <Flower2 className="h-7 w-7 text-primary-500" />
-        <span className="text-xl font-bold tracking-tight">CycleCare</span>
+      <div className="flex items-center px-6 py-5 border-b border-border">
+        <BrandLogo variant="full" size="sm" />
       </div>
       <nav className="flex-1 px-3 py-4 space-y-1">
         {sidebarItems.map((item) => {

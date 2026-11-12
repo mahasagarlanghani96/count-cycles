@@ -2,31 +2,34 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "CycleCare",
+    name: "CycleCare - Menstrual Health Tracker",
     short_name: "CycleCare",
     description:
-      "Your personal menstrual health companion. Track cycles, understand your body, and get personalized wellness guidance.",
+      "A personal menstrual cycle and wellness tracking application.",
     start_url: "/dashboard",
+    scope: "/",
     display: "standalone",
-    background_color: "#faf9fd",
-    theme_color: "#8971e8",
+    background_color: "#F3F0FF",
+    theme_color: "#8971E8",
     orientation: "portrait-primary",
     categories: ["health", "lifestyle"],
     icons: [
       {
-        src: "/icons/icon-192.svg",
+        src: "/icons/icon-192.png",
         sizes: "192x192",
-        type: "image/svg+xml",
+        type: "image/png",
+        purpose: "any",
       },
       {
-        src: "/icons/icon-512.svg",
+        src: "/icons/icon-512.png",
         sizes: "512x512",
-        type: "image/svg+xml",
+        type: "image/png",
+        purpose: "any",
       },
       {
-        src: "/icons/icon-512.svg",
+        src: "/icons/icon-maskable-512.png",
         sizes: "512x512",
-        type: "image/svg+xml",
+        type: "image/png",
         purpose: "maskable",
       },
     ],

@@ -4,7 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Flower2, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import { BrandLogo } from "@/components/shared/brand-logo";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -88,8 +89,8 @@ export default function ForgotPasswordPage() {
     <div className="flex min-h-screen items-center justify-center px-4">
       <Card className="w-full max-w-md rounded-2xl shadow-lg">
         <CardHeader className="items-center text-center">
-          <div className="mb-2 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-100">
-            <Flower2 className="h-7 w-7 text-primary-500" />
+          <div className="mb-2">
+            <BrandLogo variant="icon" size="md" />
           </div>
           <CardTitle className="text-2xl">Reset your password</CardTitle>
           <CardDescription>

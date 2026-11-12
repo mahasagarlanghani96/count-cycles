@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
-  <rect width="192" height="192" rx="32" fill="#8971E8"/>
-  <circle cx="96" cy="88" r="40" fill="none" stroke="white" stroke-width="6"/>
-  <path d="M96 58 C106 68, 116 78, 116 88 C116 98, 106 108, 96 118 C86 108, 76 98, 76 88 C76 78, 86 68, 96 58Z" fill="#F4A8C1" opacity="0.9"/>
-  <text x="96" y="160" text-anchor="middle" font-family="sans-serif" font-size="20" font-weight="bold" fill="white">CycleCare</text>
-</svg>
