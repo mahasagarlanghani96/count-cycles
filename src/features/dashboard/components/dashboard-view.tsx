@@ -15,8 +15,22 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { CycleRing } from "./cycle-ring";
 import { QuickActions } from "./quick-actions";
+
+const PHASE_INFO: Record<CyclePhase, string> = {
+  menstrual:
+    "Menstrual phase — your period. The uterine lining sheds. Typically days 1–5 of your cycle.",
+  follicular:
+    "Follicular phase — estrogen rises, energy increases, and your body prepares to release an egg. Typically days 6–12.",
+  ovulatory:
+    "Ovulatory phase — an egg is released. You may feel peak energy and confidence. Typically around days 13–15.",
+  luteal:
+    "Luteal phase — progesterone rises as your body prepares for the next cycle. PMS symptoms may appear. Typically days 16–28.",
+  unknown:
+    "We need at least one logged period to determine your current phase.",
+};
 
 const PHASE_GUIDANCE: Record<CyclePhase, { title: string; body: string }> = {
   menstrual: {
@@ -148,25 +162,37 @@ export function DashboardView() {
         <CardContent>
           <div className="grid grid-cols-2 gap-4">
             <div className="rounded-xl bg-pink-50/50 p-3 dark:bg-pink-950/20">
-              <p className="text-xs text-muted">Cycle Day</p>
+              <div className="flex items-center gap-1">
+                <p className="text-xs text-muted">Cycle Day</p>
+                <InfoTooltip text="Which day of your current menstrual cycle you are on. Day 1 is the first day of your period." />
+              </div>
               <p className="text-xl font-bold text-foreground">
                 {cycleDay ?? "--"}
               </p>
             </div>
             <div className="rounded-xl bg-purple-50/50 p-3 dark:bg-purple-950/20">
-              <p className="text-xs text-muted">Phase</p>
+              <div className="flex items-center gap-1">
+                <p className="text-xs text-muted">Phase</p>
+                <InfoTooltip text={PHASE_INFO[phase]} />
+              </div>
               <p className="text-xl font-bold text-foreground capitalize">
                 {phase}
               </p>
             </div>
             <div className="rounded-xl bg-amber-50/50 p-3 dark:bg-amber-950/20">
-              <p className="text-xs text-muted">Days Until Next</p>
+              <div className="flex items-center gap-1">
+                <p className="text-xs text-muted">Days Until Next</p>
+                <InfoTooltip text="Estimated days until your next period starts, based on your average cycle length." />
+              </div>
               <p className="text-xl font-bold text-foreground">
                 {cycleInfo?.daysUntilNextPeriod ?? "--"}
               </p>
             </div>
             <div className="rounded-xl bg-teal-50/50 p-3 dark:bg-teal-950/20">
-              <p className="text-xs text-muted">Next Period</p>
+              <div className="flex items-center gap-1">
+                <p className="text-xs text-muted">Next Period</p>
+                <InfoTooltip text="Predicted start date of your next period. This is an estimate based on your tracked cycles — not a medical prediction." />
+              </div>
               <p className="text-sm font-semibold text-foreground">
                 {cycleInfo?.nextPeriodEstimate
                   ? format(new Date(cycleInfo.nextPeriodEstimate), "MMM d")
