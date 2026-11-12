@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { format } from "date-fns";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -79,7 +80,7 @@ export function QuickActions({ latestPeriod, isOnPeriod }: QuickActionsProps) {
             className="h-auto flex-col gap-2 rounded-2xl border-pink-200 bg-pink-50/50 px-4 py-4 text-pink-700 hover:bg-pink-100/80 dark:border-pink-900 dark:bg-pink-950/30 dark:text-pink-300 dark:hover:bg-pink-950/50"
             disabled={isOnPeriod}
           >
-            <span className="text-2xl">🩸</span>
+            <span className="text-2xl">{"\u{1FA78}"}</span>
             <span className="text-xs font-medium">Start Period</span>
           </Button>
         </DialogTrigger>
@@ -117,7 +118,7 @@ export function QuickActions({ latestPeriod, isOnPeriod }: QuickActionsProps) {
             className="h-auto flex-col gap-2 rounded-2xl border-purple-200 bg-purple-50/50 px-4 py-4 text-purple-700 hover:bg-purple-100/80 dark:border-purple-900 dark:bg-purple-950/30 dark:text-purple-300 dark:hover:bg-purple-950/50"
             disabled={!isOnPeriod}
           >
-            <span className="text-2xl">✓</span>
+            <span className="text-2xl">{"✓"}</span>
             <span className="text-xs font-medium">End Period</span>
           </Button>
         </DialogTrigger>
@@ -148,22 +149,22 @@ export function QuickActions({ latestPeriod, isOnPeriod }: QuickActionsProps) {
       </Dialog>
 
       {/* Log Symptoms */}
-      <a
+      <Link
         href="/symptoms"
         className="inline-flex h-auto flex-col items-center justify-center gap-2 rounded-2xl border-2 border-amber-200 bg-amber-50/50 px-4 py-4 text-amber-700 hover:bg-amber-100/80 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-300 dark:hover:bg-amber-950/50 text-sm font-semibold transition-all duration-200"
       >
-        <span className="text-2xl">📋</span>
+        <span className="text-2xl">{"\u{1F4CB}"}</span>
         <span className="text-xs font-medium">Log Symptoms</span>
-      </a>
+      </Link>
 
       {/* Log Mood */}
-      <a
+      <Link
         href="/mood"
         className="inline-flex h-auto flex-col items-center justify-center gap-2 rounded-2xl border-2 border-teal-200 bg-teal-50/50 px-4 py-4 text-teal-700 hover:bg-teal-100/80 dark:border-teal-900 dark:bg-teal-950/30 dark:text-teal-300 dark:hover:bg-teal-950/50 text-sm font-semibold transition-all duration-200"
       >
-        <span className="text-2xl">😊</span>
+        <span className="text-2xl">{"\u{1F60A}"}</span>
         <span className="text-xs font-medium">Log Mood</span>
-      </a>
+      </Link>
     </div>
   );
 }

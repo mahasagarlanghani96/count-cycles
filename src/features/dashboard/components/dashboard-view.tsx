@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { createClient } from "@/lib/supabase/client";
@@ -17,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CycleRing } from "./cycle-ring";
 import { QuickActions } from "./quick-actions";
+import { LogPastPeriod } from "@/features/periods/components/log-past-period";
 
 const PHASE_GUIDANCE: Record<CyclePhase, { title: string; body: string }> = {
   menstrual: {
@@ -44,6 +46,7 @@ const PHASE_GUIDANCE: Record<CyclePhase, { title: string; body: string }> = {
 export function DashboardView() {
   const supabase = createClient();
   const { user } = useAuth();
+  const [pastPeriodOpen, setPastPeriodOpen] = useState(false);
 
   const {
     data: periods,
@@ -187,10 +190,20 @@ export function DashboardView() {
 
       {/* Quick Actions */}
       <div>
-        <h2 className="mb-3 text-sm font-semibold text-muted">
-          Quick Actions
-        </h2>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold text-muted">
+            Quick Actions
+          </h2>
+          <button
+            type="button"
+            onClick={() => setPastPeriodOpen(true)}
+            className="text-xs font-medium text-primary-500 hover:underline"
+          >
+            Log past period
+          </button>
+        </div>
         <QuickActions latestPeriod={latestPeriod} isOnPeriod={isOnPeriod} />
+        <LogPastPeriod open={pastPeriodOpen} onOpenChange={setPastPeriodOpen} />
       </div>
 
       {/* Daily Guidance */}
