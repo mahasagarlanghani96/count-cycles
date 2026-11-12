@@ -2,148 +2,149 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { format } from "date-fns";
-import { useQueryClient } from "@tanstack/react-query";
+import { format, isBefore, isAfter, startOfDay } from "date-fns";
+import { useCreatePeriod } from "@/features/periods/hooks/use-periods";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { createClient } from "@/lib/supabase/client";
-import { useAuth } from "@/providers/auth-provider";
-import type { PeriodRecord } from "@/types";
 
-interface QuickActionsProps {
-  latestPeriod: PeriodRecord | null;
-  isOnPeriod: boolean;
-}
-
-export function QuickActions({ latestPeriod, isOnPeriod }: QuickActionsProps) {
-  const supabase = createClient();
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
-  const [startDialogOpen, setStartDialogOpen] = useState(false);
-  const [endDialogOpen, setEndDialogOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+export function QuickActions() {
+  const [logDialogOpen, setLogDialogOpen] = useState(false);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const createPeriod = useCreatePeriod();
 
   const today = format(new Date(), "yyyy-MM-dd");
 
-  async function handleStartPeriod() {
-    if (!user) return;
-    setLoading(true);
-    try {
-      const { error } = await supabase.from("period_records").insert({
-        user_id: user.id,
-        start_date: today,
-        is_predicted: false,
-        notes: null,
-      });
-      if (error) throw error;
-      await queryClient.invalidateQueries({ queryKey: ["period_records"] });
-      setStartDialogOpen(false);
-    } catch (err) {
-      console.error("Failed to start period:", err);
-    } finally {
-      setLoading(false);
+  function validate(): string | null {
+    if (!startDate) return "Please select a start date.";
+    if (!endDate) return "Please select an end date.";
+    if (isAfter(startOfDay(new Date(startDate)), startOfDay(new Date()))) {
+      return "Start date cannot be in the future.";
     }
+    if (isAfter(startOfDay(new Date(endDate)), startOfDay(new Date()))) {
+      return "End date cannot be in the future.";
+    }
+    if (isBefore(new Date(endDate), new Date(startDate))) {
+      return "End date must be on or after start date.";
+    }
+    return null;
   }
 
-  async function handleEndPeriod() {
-    if (!latestPeriod) return;
-    setLoading(true);
-    try {
-      const { error } = await supabase
-        .from("period_records")
-        .update({ end_date: today })
-        .eq("id", latestPeriod.id);
-      if (error) throw error;
-      await queryClient.invalidateQueries({ queryKey: ["period_records"] });
-      setEndDialogOpen(false);
-    } catch (err) {
-      console.error("Failed to end period:", err);
-    } finally {
-      setLoading(false);
+  function handleSave() {
+    const validationError = validate();
+    if (validationError) {
+      setError(validationError);
+      return;
     }
+    setError(null);
+    createPeriod.mutate(
+      {
+        start_date: startDate,
+        end_date: endDate,
+        is_predicted: false,
+        notes: null,
+      },
+      {
+        onSuccess: () => {
+          handleClose();
+        },
+        onError: (err) => {
+          setError(err instanceof Error ? err.message : "Failed to save.");
+        },
+      }
+    );
+  }
+
+  function handleClose() {
+    setStartDate("");
+    setEndDate("");
+    setError(null);
+    setLogDialogOpen(false);
   }
 
   return (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-      {/* Start Period */}
-      <Dialog open={startDialogOpen} onOpenChange={setStartDialogOpen}>
-        <DialogTrigger asChild>
-          <Button
-            variant="outline"
-            className="h-auto flex-col gap-2 rounded-2xl border-pink-200 bg-pink-50/50 px-4 py-4 text-pink-700 hover:bg-pink-100/80 dark:border-pink-900 dark:bg-pink-950/30 dark:text-pink-300 dark:hover:bg-pink-950/50"
-            disabled={isOnPeriod}
-          >
-            <span className="text-2xl">{"\u{1FA78}"}</span>
-            <span className="text-xs font-medium">Start Period</span>
-          </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Start Period</DialogTitle>
-            <DialogDescription>
-              Record the start of your period for today, {format(new Date(), "MMMM d, yyyy")}.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex gap-3 mt-4">
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={() => setStartDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              className="flex-1 bg-pink-600 hover:bg-pink-700 text-white"
-              onClick={handleStartPeriod}
-              disabled={loading}
-            >
-              {loading ? "Saving..." : "Confirm"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+    <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+      {/* Log Period */}
+      <button
+        type="button"
+        onClick={() => setLogDialogOpen(true)}
+        className="inline-flex h-auto flex-col items-center justify-center gap-2 rounded-2xl border-2 border-pink-200 bg-pink-50/50 px-4 py-4 text-pink-700 hover:bg-pink-100/80 dark:border-pink-900 dark:bg-pink-950/30 dark:text-pink-300 dark:hover:bg-pink-950/50 text-sm font-semibold transition-all duration-200"
+      >
+        <span className="text-2xl">{"\u{1FA78}"}</span>
+        <span className="text-xs font-medium">Log Period</span>
+      </button>
 
-      {/* End Period */}
-      <Dialog open={endDialogOpen} onOpenChange={setEndDialogOpen}>
-        <DialogTrigger asChild>
-          <Button
-            variant="outline"
-            className="h-auto flex-col gap-2 rounded-2xl border-purple-200 bg-purple-50/50 px-4 py-4 text-purple-700 hover:bg-purple-100/80 dark:border-purple-900 dark:bg-purple-950/30 dark:text-purple-300 dark:hover:bg-purple-950/50"
-            disabled={!isOnPeriod}
-          >
-            <span className="text-2xl">{"✓"}</span>
-            <span className="text-xs font-medium">End Period</span>
-          </Button>
-        </DialogTrigger>
+      <Dialog open={logDialogOpen} onOpenChange={handleClose}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>End Period</DialogTitle>
+            <DialogTitle>Log Period</DialogTitle>
             <DialogDescription>
-              Mark your period as ended today, {format(new Date(), "MMMM d, yyyy")}.
+              Record your period with start and end dates.
             </DialogDescription>
           </DialogHeader>
-          <div className="flex gap-3 mt-4">
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={() => setEndDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
-              onClick={handleEndPeriod}
-              disabled={loading}
-            >
-              {loading ? "Saving..." : "Confirm"}
-            </Button>
+
+          <div className="space-y-4 mt-2">
+            {error && (
+              <div className="rounded-xl bg-red-50 p-3 text-center text-sm text-red-600">
+                {error}
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <label htmlFor="qa-start-date" className="text-sm font-medium">
+                Start Date <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="qa-start-date"
+                type="date"
+                max={today}
+                value={startDate}
+                onChange={(e) => {
+                  setStartDate(e.target.value);
+                  setError(null);
+                }}
+                className="flex w-full rounded-xl border border-border bg-surface px-4 py-2.5 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="qa-end-date" className="text-sm font-medium">
+                End Date <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="qa-end-date"
+                type="date"
+                min={startDate || undefined}
+                max={today}
+                value={endDate}
+                onChange={(e) => {
+                  setEndDate(e.target.value);
+                  setError(null);
+                }}
+                className="flex w-full rounded-xl border border-border bg-surface px-4 py-2.5 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              />
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <Button variant="outline" className="flex-1" onClick={handleClose}>
+                Cancel
+              </Button>
+              <Button
+                className="flex-1"
+                onClick={handleSave}
+                loading={createPeriod.isPending}
+                disabled={!startDate || !endDate}
+              >
+                Save Period
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

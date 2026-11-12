@@ -665,16 +665,15 @@ describe("isDateInPeriod", () => {
     expect(result!.start_date).toBe("2025-03-29");
   });
 
-  it("uses default 5-day period when end_date is null", () => {
+  it("only matches start date when end_date is null", () => {
     const noEndPeriods: PeriodRecord[] = [
       makePeriod("2025-03-01", null),
     ];
-    // default end = start + 4 = 2025-03-05
-    const withinDefault = isDateInPeriod(new Date("2025-03-04"), noEndPeriods);
-    expect(withinDefault).not.toBeNull();
+    const onStart = isDateInPeriod(new Date("2025-03-01"), noEndPeriods);
+    expect(onStart).not.toBeNull();
 
-    const outsideDefault = isDateInPeriod(new Date("2025-03-06"), noEndPeriods);
-    expect(outsideDefault).toBeNull();
+    const dayAfter = isDateInPeriod(new Date("2025-03-02"), noEndPeriods);
+    expect(dayAfter).toBeNull();
   });
 
   it("returns null for empty periods array", () => {

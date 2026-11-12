@@ -217,7 +217,7 @@ export function isDateInPeriod(
     const start = parseISO(period.start_date);
     const end = period.end_date
       ? parseISO(period.end_date)
-      : addDays(start, 4);
+      : start;
     if (
       (isAfter(day, start) || isEqual(day, start)) &&
       (isBefore(day, addDays(end, 1)))

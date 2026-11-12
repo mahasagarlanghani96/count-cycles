@@ -9,6 +9,7 @@ import {
   BarChart3,
   User,
   BookOpen,
+  ClipboardList,
 } from "lucide-react";
 import { BrandLogo } from "@/components/shared/brand-logo";
 import { cn } from "@/lib/utils";
@@ -16,6 +17,7 @@ import { cn } from "@/lib/utils";
 const sidebarItems = [
   { href: "/dashboard", label: "Home", icon: Home },
   { href: "/calendar", label: "Calendar", icon: Calendar },
+  { href: "/period-history", label: "History", icon: ClipboardList },
   { href: "/daily-care", label: "Daily Care", icon: Heart },
   { href: "/insights", label: "Insights", icon: BarChart3 },
   { href: "/education", label: "Learn", icon: BookOpen },

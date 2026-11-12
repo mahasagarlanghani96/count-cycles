@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { createClient } from "@/lib/supabase/client";
@@ -18,7 +17,6 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CycleRing } from "./cycle-ring";
 import { QuickActions } from "./quick-actions";
-import { LogPastPeriod } from "@/features/periods/components/log-past-period";
 
 const PHASE_GUIDANCE: Record<CyclePhase, { title: string; body: string }> = {
   menstrual: {
@@ -46,7 +44,6 @@ const PHASE_GUIDANCE: Record<CyclePhase, { title: string; body: string }> = {
 export function DashboardView() {
   const supabase = createClient();
   const { user } = useAuth();
-  const [pastPeriodOpen, setPastPeriodOpen] = useState(false);
 
   const {
     data: periods,
@@ -94,9 +91,6 @@ export function DashboardView() {
   const phase = cycleInfo?.phase ?? "unknown";
   const cycleDay = cycleInfo?.cycleDay ?? null;
   const cycleLength = 28;
-  const latestPeriod = periods && periods.length > 0 ? periods[0] : null;
-  const isOnPeriod = cycleInfo?.isOnPeriod ?? false;
-
   const guidance = PHASE_GUIDANCE[phase];
   const todaysLog = dailyLogs?.find(
     (log) => log.log_date === format(new Date(), "yyyy-MM-dd")
@@ -180,7 +174,7 @@ export function DashboardView() {
               </p>
             </div>
           </div>
-          {isOnPeriod && (
+          {cycleInfo?.isOnPeriod && (
             <Badge className="mt-3 bg-pink-100 text-pink-700 border-pink-200 dark:bg-pink-950/40 dark:text-pink-300 dark:border-pink-800">
               Currently on period
             </Badge>
@@ -190,20 +184,10 @@ export function DashboardView() {
 
       {/* Quick Actions */}
       <div>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-muted">
-            Quick Actions
-          </h2>
-          <button
-            type="button"
-            onClick={() => setPastPeriodOpen(true)}
-            className="text-xs font-medium text-primary-500 hover:underline"
-          >
-            Log past period
-          </button>
-        </div>
-        <QuickActions latestPeriod={latestPeriod} isOnPeriod={isOnPeriod} />
-        <LogPastPeriod open={pastPeriodOpen} onOpenChange={setPastPeriodOpen} />
+        <h2 className="mb-3 text-sm font-semibold text-muted">
+          Quick Actions
+        </h2>
+        <QuickActions />
       </div>
 
       {/* Daily Guidance */}

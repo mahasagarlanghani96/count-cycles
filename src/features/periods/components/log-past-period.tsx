@@ -28,16 +28,15 @@ export function LogPastPeriod({ open, onOpenChange }: LogPastPeriodProps) {
 
   function validate(): string | null {
     if (!startDate) return "Please select a start date.";
+    if (!endDate) return "Please select an end date.";
     if (isAfter(startOfDay(new Date(startDate)), startOfDay(new Date()))) {
       return "Start date cannot be in the future.";
     }
-    if (endDate) {
-      if (isBefore(new Date(endDate), new Date(startDate))) {
-        return "End date must be after start date.";
-      }
-      if (isAfter(startOfDay(new Date(endDate)), startOfDay(new Date()))) {
-        return "End date cannot be in the future.";
-      }
+    if (isBefore(new Date(endDate), new Date(startDate))) {
+      return "End date must be on or after start date.";
+    }
+    if (isAfter(startOfDay(new Date(endDate)), startOfDay(new Date()))) {
+      return "End date cannot be in the future.";
     }
     return null;
   }
@@ -52,7 +51,7 @@ export function LogPastPeriod({ open, onOpenChange }: LogPastPeriodProps) {
     createPeriod.mutate(
       {
         start_date: startDate,
-        end_date: endDate || null,
+        end_date: endDate,
         is_predicted: false,
         notes: notes.trim() || null,
       },
@@ -115,7 +114,7 @@ export function LogPastPeriod({ open, onOpenChange }: LogPastPeriodProps) {
 
           <div className="space-y-2">
             <label htmlFor="past-end-date" className="text-sm font-medium">
-              End Date <span className="text-muted font-normal">(optional)</span>
+              End Date <span className="text-red-500">*</span>
             </label>
             <input
               id="past-end-date"
@@ -153,7 +152,7 @@ export function LogPastPeriod({ open, onOpenChange }: LogPastPeriodProps) {
               className="flex-1"
               onClick={handleSave}
               loading={createPeriod.isPending}
-              disabled={!startDate}
+              disabled={!startDate || !endDate}
             >
               Save Period
             </Button>
