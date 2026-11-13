@@ -54,7 +54,7 @@ export function MoodLogger() {
             mood,
             energy_level: energy,
             sleep_quality: sleep,
-            notes: notes.trim() || todaysLog.notes,
+            notes: notes.trim() || null,
           })
           .eq("id", todaysLog.id);
         if (error) throw error;

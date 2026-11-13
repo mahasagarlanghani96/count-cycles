@@ -109,6 +109,7 @@ export function ProfileView() {
   async function handleDeleteAccount() {
     if (deleteConfirm !== "DELETE") return;
 
+    await supabase.from("login_sessions").delete().eq("user_id", user!.id);
     await supabase.from("symptom_logs").delete().eq("user_id", user!.id);
     await supabase.from("daily_logs").delete().eq("user_id", user!.id);
     await supabase.from("period_records").delete().eq("user_id", user!.id);

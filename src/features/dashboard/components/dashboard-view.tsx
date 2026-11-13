@@ -97,7 +97,13 @@ export function DashboardView() {
     enabled: !!user,
   });
 
-  const todayStr = format(new Date(), "yyyy-MM-dd");
+  const [now, setNow] = useState(new Date());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const todayStr = format(now, "yyyy-MM-dd");
 
   const { data: todaySymptoms } = useQuery<SymptomLog[]>({
     queryKey: ["symptom_logs", user?.id, todayStr],
@@ -128,12 +134,6 @@ export function DashboardView() {
   const todaysLog = dailyLogs?.find(
     (log) => log.log_date === todayStr
   );
-
-  const [now, setNow] = useState(new Date());
-  useEffect(() => {
-    const timer = setInterval(() => setNow(new Date()), 60_000);
-    return () => clearInterval(timer);
-  }, []);
 
   const hour = now.getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";

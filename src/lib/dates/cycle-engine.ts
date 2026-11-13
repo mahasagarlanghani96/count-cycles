@@ -196,7 +196,8 @@ export function estimatePhase(
   cycleLength: number,
   periodLength: number
 ): CyclePhase {
-  if (cycleDay <= 0 || cycleDay > cycleLength) return "unknown";
+  if (cycleDay <= 0) return "unknown";
+  if (cycleDay > cycleLength) return "luteal";
   if (cycleDay <= periodLength) return "menstrual";
 
   const ovulationDay = Math.round(cycleLength - 14);
@@ -217,7 +218,7 @@ export function isDateInPeriod(
     const start = parseISO(period.start_date);
     const end = period.end_date
       ? parseISO(period.end_date)
-      : start;
+      : startOfDay(new Date());
     if (
       (isAfter(day, start) || isEqual(day, start)) &&
       (isBefore(day, addDays(end, 1)))

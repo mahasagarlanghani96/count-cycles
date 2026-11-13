@@ -581,8 +581,8 @@ describe("estimatePhase", () => {
     expect(estimatePhase(-1, 28, 5)).toBe("unknown");
   });
 
-  it("returns unknown for day exceeding cycle length", () => {
-    expect(estimatePhase(29, 28, 5)).toBe("unknown");
+  it("returns luteal for day exceeding cycle length (late period)", () => {
+    expect(estimatePhase(29, 28, 5)).toBe("luteal");
   });
 
   // 21-day cycle
@@ -683,7 +683,7 @@ describe("isDateInPeriod", () => {
     expect(result!.start_date).toBe("2025-03-29");
   });
 
-  it("only matches start date when end_date is null", () => {
+  it("matches all days from start to today when end_date is null (ongoing period)", () => {
     const noEndPeriods: PeriodRecord[] = [
       makePeriod("2025-03-01", null),
     ];
@@ -691,7 +691,7 @@ describe("isDateInPeriod", () => {
     expect(onStart).not.toBeNull();
 
     const dayAfter = isDateInPeriod(new Date("2025-03-02"), noEndPeriods);
-    expect(dayAfter).toBeNull();
+    expect(dayAfter).not.toBeNull();
   });
 
   it("returns null for empty periods array", () => {

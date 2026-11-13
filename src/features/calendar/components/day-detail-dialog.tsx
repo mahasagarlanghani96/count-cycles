@@ -131,6 +131,13 @@ function DayDetailForm({
       }
 
       if (selectedSymptoms.length > 0) {
+        await supabase
+          .from("symptom_logs")
+          .delete()
+          .eq("user_id", user.id)
+          .eq("log_date", logDate)
+          .in("symptom_name", selectedSymptoms);
+
         const symptomRows = selectedSymptoms.map((name) => ({
           user_id: user.id,
           log_date: logDate,
