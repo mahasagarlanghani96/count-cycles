@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SessionList } from "@/features/auth/components/session-list";
+import { ChangePassword } from "@/features/auth/components/change-password";
 import type { Profile, UserPreferences } from "@/types";
 
 export function ProfileView() {
@@ -164,6 +165,8 @@ export function ProfileView() {
           </div>
         </CardContent>
       </Card>
+
+      <ChangePassword />
 
       <Card>
         <CardHeader>
